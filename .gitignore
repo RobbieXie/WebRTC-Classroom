@@ -1,0 +1,14 @@
+.DS_Store
+.idea
+*.mp3
+*.mp4
+*.ogg
+*.ogv
+*.m4s
+*.ts
+*.mpd
+*.m3u8
+node_modules
+out
+html-template
+fp_plugin

@@ -1,0 +1,30 @@
+{
+  "name": "socketiochat",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "PORT=3000 node ./bin/www",
+    "install_socketio": "npm install --save socket.io",
+    "install_mixer": "npm install --save multistreamsmixer",
+    "install_webpack": "npm install --save-dev webpack webpack-cli",
+    "build": "webpack",
+    "build_and_watch": "webpack --watch"
+  },
+  "dependencies": {
+    "bufferutil": "^4.0.1",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "multistreamsmixer": "^1.2.2",
+    "socket.io": "^2.3.0",
+    "twig": "~0.10.3",
+    "utf-8-validate": "^5.0.2"
+  },
+  "devDependencies": {
+    "html-loader": "^0.5.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  }
+}
