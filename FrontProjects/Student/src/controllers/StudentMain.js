@@ -14,8 +14,8 @@ const StudentMain = Vue.component("student-main", {
         this._remoteStream = new MediaStream();
         this.$refs.remote_preview.srcObject = this._remoteStream;
 
+        this.showUsernameDialog();
         this.addSocketListeners();
-        this.showJoinClassroomDialog();
     },
 
     methods: {
@@ -78,6 +78,17 @@ const StudentMain = Vue.component("student-main", {
                     this.showJoinClassroomDialog();
                 }
             }, "static", false, false, "", "加入");
+        },
+
+        showUsernameDialog() {
+            Dialog.showInput("请给自己起个昵称", (name) => {
+                if (name) {
+                    this.username = name;
+                    this.showJoinClassroomDialog();
+                } else {
+                    this.showUsernameDialog();
+                }
+            }, "static", false, false, "", "ok");
         },
     }
 });
