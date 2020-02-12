@@ -7,6 +7,10 @@
     + H5 Web API: 视频音频流获取 Navigator, MediaStream, etc.
     + Vue.js - 前端框架
 
+  直播间demo:
+    
+  ![demo](img/demo.png)
+
 
 ## 二、运行步骤
 1. 安装项目依赖
