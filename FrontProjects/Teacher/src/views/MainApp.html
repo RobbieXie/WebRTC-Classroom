@@ -1,12 +1,15 @@
 <div>
     <div class="card">
         <div class="card-header font-weight-bold">
-            教室名：{{classroomName}}
+            教室名：{{classroomName}}, 主播：{{username}}
         </div>
         <div style="display: flex;flex-direction: row;">
             <!-- <div style="display: flex;flex-direction: column;width: 220px"> -->
                 <client-list ref="client_list"></client-list>
-                <video id="video" style="width: 70%;display: block" controls autoplay ref="local_preview"></video>
+                <div id="barrange-div" class="card" style="width: 60%;">
+                    <video id="video1" style="width: 100%;display: block" controls autoplay ref="local_preview"></video>
+                </div>
+                <message-list v-on:sendMessage="sendMessage"  ref="message_list"></message-list>
             <!-- </div> -->
         </div>
     </div>

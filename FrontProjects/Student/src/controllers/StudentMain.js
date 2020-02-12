@@ -1,28 +1,48 @@
 import Tpl from "../views/StudentMain.html"
 import Dialog from "../../../commons/Dialog";
 import "../../../commons/components/ClientList"
+import "../../../commons/components/MessageList"
+import Barrange from "../../../commons/Barrage"
 
 const StudentMain = Vue.component("student-main", {
     template: Tpl,
     data() {
         return {
-            classroomName: ""
+            classroomName: "",
+            username:""
         };
     },
     mounted() {
-        this._socket = io('wss://xietiandi.tech', { path: '/live/socket.io'});
+        // this._socket = io('wss://xietiandi.tech', { path: '/live/socket.io'});
+        this._socket = io();
         this._remoteStream = new MediaStream();
         this.$refs.remote_preview.srcObject = this._remoteStream;
 
-        this.showUsernameDialog();
+        localStorage.clear();
         this.addSocketListeners();
+        this.showUsernameDialog();
     },
 
     methods: {
+        sendMessage(room, content) {
+            console.log('sendmsg...' + room + " " + content);
+            this._socket.emit("msg", room, content);
+        },
+
         addSocketListeners() {
             this._socket.on("listClients", clients => {
                 this.$refs.client_list.setClients(clients);
             });
+
+            this._socket.on("listMessages", messages => {
+                this.$refs.message_list.setMessages(messages);
+            });
+
+            this._socket.on("gotMsg", (username, content) => {
+                this.$refs.message_list.gotMsg({username: username, content: content});
+                Barrange.createBarrage(username + ": " + content);
+            });
+
             this._socket.on("teacherOffer", async data => {
                 console.log(data);
                 this._teacherId = data.from;
@@ -70,9 +90,10 @@ const StudentMain = Vue.component("student-main", {
             Dialog.showInput("请输入教室名称", (name) => {
                 if (name) {
                     let ld = Dialog.showLoading("正在加入教室...");
-                    this._socket.emit("joinClassroom", name, () => {
+                    this._socket.emit("joinClassroom", name, this.username, () => {
                         ld.modal("hide");
                         this.classroomName = name;
+                        localStorage.classroomName = name;
                     });
                 } else {
                     this.showJoinClassroomDialog();

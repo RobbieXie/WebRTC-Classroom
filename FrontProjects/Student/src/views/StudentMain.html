@@ -4,8 +4,12 @@
     </div>
     <div style="display: flex;flex-direction: row;">
         <client-list ref="client_list"></client-list>
-        <video style="display: block;width: 70%" controls autoplay ref="remote_preview"></video>
-        <client-list ref="client_list"></client-list>
+
+        <div id="barrange-div" class="card" style="width: 60%;">
+            <video style="display: block;width: 100%" controls autoplay ref="remote_preview"></video>
+        </div>
+
+        <message-list v-on:sendMessage="sendMessage"  ref="message_list"></message-list>
     </div>
     <div style="display: flex;flex-direction: row;">
     </div>

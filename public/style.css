@@ -1,0 +1,44 @@
+/* 弹幕 */
+.barrage{
+
+    /*  设置为 绝对定位 */
+
+    position: absolute;
+
+    /* 设置为 块级元素 */
+    display: block;
+
+    font-size: 30px;
+
+    /* 设置左边距 使弹幕初始位置在视频部分之外 */
+    /* left: 800px; */
+    right: -100px;
+
+    z-index: 1;
+}
+
+/* 视频部分 */
+#video{
+
+    /* 设置宽高 */
+    width: 800px;
+    height: 500px;
+
+    /* 设置背景颜色 */
+    background:#595959;
+
+    /* 设置为 居中 */
+    margin: 0 auto;
+
+    /* 设置阴影 */
+    box-shadow: 2px 2px 5px #333;
+
+    /* 设置为 相对定位 */
+    position: relative;
+
+    /* 设置里面的文字大小 */
+    font-size: 16px;
+
+    /* 隐藏溢出 */
+    overflow: hidden;
+}
