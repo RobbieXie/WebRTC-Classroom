@@ -3,7 +3,7 @@
 ## 一、 相关技术栈
     + WebRTC - P2P媒体流传输
     + coturn - ICE, STUN, TURN服务器
-    + SocketIO - 实现简单信令
+    + SocketIO - 实现webrtc信令功能与基本IM功能
     + H5 Web API: 视频音频流获取 Navigator, MediaStream, etc.
     + Vue.js - 前端框架
 
@@ -154,4 +154,6 @@
         // '/live/' 为反向代理的path
         this._socket = io('wss://your_hostname', { path: '/live/socket.io'})
         ```
-    
+## 特别说明
+
+ 本文来自于多篇老师的博客与自己的一些思考，刚接触这个领域，欢迎大家有问题通过issue指出，也欢迎一起完善这个小demo。
