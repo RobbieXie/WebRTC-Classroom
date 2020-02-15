@@ -3,7 +3,7 @@
 ## 一、 相关技术栈
     + WebRTC - P2P媒体流传输
     + coturn - ICE, STUN, TURN服务器
-    + SocketIO - 实现webrtc信令功能与基本IM功能
+    + NodeJS + SocketIO - 实现webrtc信令功能与基本IM功能
     + H5 Web API: 视频音频流获取 Navigator, MediaStream, etc.
     + Vue.js - 前端框架
 
@@ -24,6 +24,7 @@
     > npm start
 
 4. 如果想外网实现直播，需要注意以下两点：
+   
    a) 本地获取视频流，需要https域名，或者chrome->设置->信任你的站点 否则navigator.mediaDevices为undifined。
    > 设置方法chrome打开: chrome://flags/#unsafely-treat-insecure-origin-as-secure
 
@@ -75,6 +76,7 @@
     (3) Client A 调用 SetLocalDescription 方法将 SDP 保存起来；
     
     (4) Client A 通过信令机制将自己的 SDP 发送给 Client B;
+
     (5) Client B 接收到 Client A 发送过来的 offer SDP对象，通过自己的 PeerConnection 的 SetRemoteDescription 方法将其保存起来;
 
     (6) Client B 调用 PeerConnection 的 CreateAnswer 方法创建一个应答的 SDP 对象；
@@ -158,6 +160,36 @@
         // '/live/' 为反向代理的path
         this._socket = io('wss://your_hostname', { path: '/live/socket.io'})
         ```
+
+## Node端 rtmp推流功能加入
+  ### 相关技术介绍
+  + MediaStreamRecorder 媒体流录制工具
+    ```js
+    mediaRecorder = new MediaStreamRecorder(stream);
+			    
+    mediaRecorder.mimeType = 'video/webm';
+    
+    mediaRecorder.ondataavailable = function(blob) {
+      // Blob is the saved .webm file.
+    };
+    ```
+  + ffmpeg 编解码工具
+    ```
+    // webm -> m3u8/.ts
+    ffmpeg -v quiet -loglevel error -i videos/hmkkv7/00000.webm -vcodec libx264 -acodec libfaac -r 25 -profile:v baseline -b:v 800k -b:a 48k -f mpegts -strict experimental -mpegts_copyts 1 -filter:v setpts=PTS+NaN/TB -y videos/hmkkv7/00000.ts
+
+    // m3u8 -> mp4
+    ffmpeg -i ./playlist.m3u8 -c copy -bsf:a aac_adtstoasc output.mp4
+
+    // mp4 -> flv -> rtmp推流
+    ffmpeg -re -i output.mp4 -acodec copy -vcodec copy -f flv rtmp://127.0.0.1:1935/hls/test
+    ```
+    + 任意流媒体服务器（支持rtmp推拉流即可）
+    + 整体流程
+    ```
+    [Streamer's Browser] -> MediaStream -> .webm video -> [NodeJS server] -> [FFmpeg] -> RTMP -> [Any_Stream_Server] -> RTMP -> [Audiences' Browsers]
+    ```
+
 ## 特别说明
 
  本文来自于多篇老师的博客与自己的一些思考，刚接触这个领域，欢迎大家有问题通过issue指出，也欢迎一起完善这个小demo。如果觉得还不错，记得 **Star** ！

@@ -1,7 +1,9 @@
 <div>
     <div class="card">
-        <div class="card-header font-weight-bold">
-            教室名：{{classroomName}}, 主播：{{username}}
+        <div class="card-header font-weight-bold" id="header">
+            教室名：{{classroomName}}, 主播：{{username}}, 
+            <buttom class="btn btn-primary" v-on:click="startRtmp()" > 开始推流</buttom>
+            <buttom class="btn btn-primary" v-on:click="stopRtmp()" > 停止推流</buttom>
         </div>
         <div style="display: flex;flex-direction: row;">
             <!-- <div style="display: flex;flex-direction: column;width: 220px"> -->

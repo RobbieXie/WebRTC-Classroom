@@ -1,7 +1,45 @@
 const SocketIOServer = require("socket.io");
+let fs = require('fs');
+let videoUtils = require('../FrontProjects/commons/videoUtils');
 
 let roomTeacherMap = new Map();
 let socketIdUsernameMap = new Map();
+let fileDurationArrs = {};
+let isLive = false;
+
+function isDirSync(aPath) {
+    try {
+      return fs.statSync(aPath).isDirectory();
+    } catch (e) {
+      if (e.code === 'ENOENT') {
+        return false;
+      } else {
+        throw e;
+      }
+    }
+}
+
+function lastN(arr, n) { // non-destructive
+	arr = arr.slice();
+	var l = arr.length;
+	var i = l - n;
+	if (i < 0) { i = 0; }
+	return arr.splice(i, n);
+}
+
+function deleteFolderRecursive(path) {
+    if( fs.existsSync(path) ) {
+        fs.readdirSync(path).forEach(function(file) {
+            var curPath = path + "/" + file;
+            if(fs.statSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
+};
 
 function configSocketIO(server) {
     let io = SocketIOServer(server);
@@ -27,6 +65,74 @@ function configSocketIO(server) {
         socket.on("msg", (roomName, content) => {
             console.log('server msg :' + roomName + " " + content);
             io.to(roomName).emit("gotMsg", socketIdUsernameMap.get(socket.id), content);
+        });
+
+        socket.on("recordBlobGot", data => {
+            console.log('server got record blob :' + data);
+            let isFirst = false;
+            let isLast = data.finished;
+            let recordId = data.recordId;
+            let recordBlob = data.blob;
+            let username = socketIdUsernameMap.get(socket.id);
+            if(isLast) {
+                isLive = false;
+            }
+
+            let dir = 'videos/' + username + "/" + socket.id;
+            if ((/^0+$/).test(recordId)) {
+                if (isDirSync(dir)) {
+                    deleteFolderRecursive(dir);
+                }
+                fs.mkdirSync(dir, { recursive: true });
+                isFirst = true;
+                isLive = true;
+                fileDurationArrs[socket.id] = [];
+            }
+
+
+            let webmFilePath =  dir + "/" + recordId + ".webm";
+            console.log("webm path: " + webmFilePath);
+            var stream = fs.createWriteStream(webmFilePath, {encoding:'binary'});
+
+            stream.on("finish", () => {
+                videoUtils.findVideoDuration(webmFilePath, (err, duration) => {
+                    if(err) {
+                        console.err(err);
+                    }
+                    console.log('duration: %s', duration.toFixed(2));
+
+                    let fd = {
+                        fileName: recordId + ".webm",
+                        filePath: webmFilePath,
+                        duration: duration
+                    };
+
+                    let fdArr = fileDurationArrs[socket.id] ? fileDurationArrs[socket.id] : [];
+                    fdArr.push(fd);
+                    fileDurationArrs[socket.id] = fdArr;
+
+                    videoUtils.computeStartTimes(fdArr);
+
+                    videoUtils.webm2Mpegts(fd, function(err, mpegtsFp) {
+                        if (err) { return console.error(err); }
+                        console.log('created %s', mpegtsFp);
+                        
+                        var playlistFp = dir + '/playlist.m3u8';
+    
+                        var lastNFdArr = (!isLive ? fdArr : lastN(fdArr, 4));
+    
+                        var action = (isFirst ? 'created' : (isLast ? 'finished' : 'updated') );
+    
+                        videoUtils.generateM3u8Playlist(lastNFdArr, playlistFp, isLive, function(err) {
+                            console.log('playlist %s %s', playlistFp, (err ? err.toString() : action) );
+                        });
+                    });
+
+                });
+            });
+
+            stream.write(recordBlob);
+            stream.end();
         });
 
         socket.on("createClassroom", (name, username, callback) => {

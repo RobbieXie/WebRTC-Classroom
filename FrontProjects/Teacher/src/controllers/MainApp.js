@@ -5,13 +5,17 @@ import "../../../commons/components/MessageList"
 import Barrange from "../../../commons/Barrage"
 import StudentConnection from "../net/StudentConnection";
 import MultiStreamsMixer from 'multistreamsmixer';
+import MediaStreamRecorder from 'msr';
 
 const MainApp = Vue.component("main-app", {
     template: Tpl,
     data() {
         return {
             classroomName: "",
-            username:""
+            username:"",
+            delay:10000,
+            blobCount:0,
+            finished:false,
         }
     },
 
@@ -51,6 +55,45 @@ const MainApp = Vue.component("main-app", {
     },
 
     methods: {
+        startRtmp() {
+            this.blobCount = 0;
+            this.finished = false;
+            this._mediaRecorder = new MediaStreamRecorder(this._mixedStream);
+            this._mediaRecorder.mimeType = 'video/webm';
+            let self = this;
+            this._mediaRecorder.ondataavailable = function (blob) {
+                // POST/PUT "Blob" using FormData/XHR2
+                // self.appendBlobLink(blob);
+                let paddingCount = self.numPadding(self.blobCount++, 6)
+                let data = {
+                    recordId: paddingCount,
+                    blob: blob,
+                    finished: self.finished,
+                    room: this.classroomName
+                }
+                console.log(data);
+                self._socket.emit("recordBlobGot", data);
+            };
+            this._mediaRecorder.start(this.delay);
+        },
+
+        numPadding(num, length) {
+            return (Array(length).join("0") + num).slice(-length);
+        },
+
+        appendBlobLink(blob) {
+            var blobURL = URL.createObjectURL(blob);
+            var aEl = document.createElement('a');
+            aEl.appendChild(document.createTextNode(blobURL));
+            aEl.href = blobURL;
+            document.getElementById("header").appendChild(aEl);
+        },
+
+        stopRtmp() {
+            this.finished = true;
+            this._mediaRecorder.stop();
+        },
+
         sendMessage(room, content) {
             console.log('sendmsg...' + room + " " + content);
             this._socket.emit("msg", room, content);
