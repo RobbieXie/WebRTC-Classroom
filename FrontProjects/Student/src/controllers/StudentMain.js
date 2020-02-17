@@ -9,7 +9,8 @@ const StudentMain = Vue.component("student-main", {
     data() {
         return {
             classroomName: "",
-            username:""
+            username:"",
+            useWebrtc: false,
         };
     },
     mounted() {

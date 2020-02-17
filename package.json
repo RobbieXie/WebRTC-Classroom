@@ -22,7 +22,9 @@
     "multistreamsmixer": "^1.2.2",
     "socket.io": "^2.3.0",
     "twig": "~0.10.3",
-    "utf-8-validate": "^5.0.2"
+    "utf-8-validate": "^5.0.2",
+    "videojs-contrib-hls": "^5.15.0",
+    "vue-video-player": "^5.0.2"
   },
   "devDependencies": {
     "html-loader": "^0.5.5",

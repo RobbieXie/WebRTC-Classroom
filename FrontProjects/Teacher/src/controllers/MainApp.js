@@ -69,7 +69,7 @@ const MainApp = Vue.component("main-app", {
                     recordId: paddingCount,
                     blob: blob,
                     finished: self.finished,
-                    room: this.classroomName
+                    room: self.classroomName
                 }
                 console.log(data);
                 self._socket.emit("recordBlobGot", data);

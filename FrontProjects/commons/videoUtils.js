@@ -133,7 +133,7 @@ function webm2Mpegts(o, cb) {
 
 
 
-function generateM3u8Playlist(fileDataArr, playlistFp, isLive, cb) {
+function generateM3u8Playlist(fileDataArr, playlistFp, isLive, recordId, cb) {
 	var durations = fileDataArr.map(function(fd) {
 		return fd.duration;
 	});
@@ -142,7 +142,7 @@ function generateM3u8Playlist(fileDataArr, playlistFp, isLive, cb) {
 	var meta = [
 		'#EXTM3U',
 		'#EXT-X-VERSION:3',
-		'#EXT-X-MEDIA-SEQUENCE:0',
+		'#EXT-X-MEDIA-SEQUENCE:' + recordId * 1,
 		'#EXT-X-ALLOW-CACHE:YES',
 		'#EXT-X-TARGETDURATION:' + Math.ceil(maxT),
 	];

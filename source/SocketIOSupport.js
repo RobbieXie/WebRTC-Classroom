@@ -74,11 +74,13 @@ function configSocketIO(server) {
             let recordId = data.recordId;
             let recordBlob = data.blob;
             let username = socketIdUsernameMap.get(socket.id);
+            let room = data.room;
+
             if(isLast) {
                 isLive = false;
             }
 
-            let dir = 'videos/' + username + "/" + socket.id;
+            let dir = 'videos/' + room ;
             if ((/^0+$/).test(recordId)) {
                 if (isDirSync(dir)) {
                     deleteFolderRecursive(dir);
@@ -123,8 +125,8 @@ function configSocketIO(server) {
     
                         var action = (isFirst ? 'created' : (isLast ? 'finished' : 'updated') );
     
-                        videoUtils.generateM3u8Playlist(lastNFdArr, playlistFp, isLive, function(err) {
-                            console.log('playlist %s %s', playlistFp, (err ? err.toString() : action) );
+                        videoUtils.generateM3u8Playlist(lastNFdArr, playlistFp, isLive, recordId, function(err) {
+                            console.log('playlist %s %s %s', playlistFp, (err ? err.toString() : action), recordId );
                         });
                     });
 
