@@ -27,8 +27,8 @@
     "vue-video-player": "^5.0.2"
   },
   "devDependencies": {
-    "html-loader": "^0.5.5",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
+    "html-loader": "^4.2.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }
